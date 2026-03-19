@@ -29,7 +29,7 @@ api.interceptors.response.use(
     return response.data
   },
   (error) => {
-    const message = error.response?.data?.message || '请求失败'
+    const message = error.response?.data?.message || error.message || '请求失败'
     ElMessage.error(message)
     
     if (error.response?.status === 401) {
@@ -50,7 +50,11 @@ export const authAPI = {
   register: (data: any) => 
     api.post('/creator/register', data),
   getCurrentUser: () => 
-    api.get('/creator/me')
+    api.get('/creator/me'),
+  updateProfile: (data: any) => 
+    api.put('/creator/profile', data),
+  changePassword: (data: any) => 
+    api.post('/creator/change-password', data)
 }
 
 // ============== 题目API ==============
@@ -68,7 +72,9 @@ export const questionAPI = {
   import: (data: FormData) => 
     api.post('/questions/import', data, {
       headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    }),
+  export: (params: any) => 
+    api.get('/questions/export', { params, responseType: 'blob' as any })
 }
 
 // ============== 试卷模板API ==============
@@ -84,7 +90,11 @@ export const templateAPI = {
   delete: (id: string) => 
     api.delete(`/templates/${id}`),
   publish: (id: string) => 
-    api.post(`/templates/${id}/publish`)
+    api.post(`/templates/${id}/publish`),
+  unpublish: (id: string) => 
+    api.post(`/templates/${id}/unpublish`),
+  duplicate: (id: string) => 
+    api.post(`/templates/${id}/duplicate`)
 }
 
 // ============== 统计API ==============
@@ -92,5 +102,31 @@ export const statsAPI = {
   getDashboard: () => 
     api.get('/creator/stats'),
   getQuestionTypes: () => 
-    api.get('/statistics/question-types')
+    api.get('/statistics/question-types'),
+  getExamTrend: (params: any) => 
+    api.get('/creator/stats/trend', { params }),
+  getUserDistribution: () => 
+    api.get('/creator/stats/users'),
+  getRevenue: (params: any) => 
+    api.get('/creator/stats/revenue', { params })
+}
+
+// ============== 考试记录API ==============
+export const examAPI = {
+  list: (params: any) => 
+    api.get('/creator/exams', { params }),
+  get: (id: string) => 
+    api.get(`/creator/exams/${id}`),
+  getDetail: (id: string) => 
+    api.get(`/creator/exams/${id}/detail`)
+}
+
+// ============== 邀请码API ==============
+export const inviteAPI = {
+  list: () => 
+    api.get('/creator/invite-codes'),
+  create: (data: any) => 
+    api.post('/creator/invite-codes', data),
+  delete: (code: string) => 
+    api.delete(`/creator/invite-codes/${code}`)
 }
